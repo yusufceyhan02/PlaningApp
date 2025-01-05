@@ -12,7 +12,6 @@ import com.ceyhan.planingapp.roomDatabase.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
 
 class AddDailyPlanViewModel(application: Application): AndroidViewModel(application) {
