@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PlaningApp</string>
+    <string name="daily_plan">Günlük Planlama</string>
+    <string name="title">Başlık</string>
+    <string name="add_new_daily_plan">Yeni Günlük Plan Ekle</string>
+    <string name="add_todo_list">Yapılacaklar Listesi Ekle</string>
+    <string name="optional_description">Açıklama (opsiyonel)</string>
+    <string name="time">Saat</string>
+    <string name="add">Ekle</string>
+    <string name="preview">Önizleme</string>
+    <string name="finish">Bitir</string>
+    <string name="ok">Tamam</string>
+    <string name="cancel">İptal</string>
+    <string name="textField_error">Bu alan boş bırakılamaz!</string>
+    <string name="empty_todo_list_warning">Henüz yapılacaklar listesi eklemediniz!</string>
+</resources>

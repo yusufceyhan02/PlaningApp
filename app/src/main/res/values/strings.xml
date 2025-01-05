@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">PlaningApp</string>
+    <string name="daily_plan">Daily Plan</string>
+    <string name="title">Title</string>
+    <string name="add_new_daily_plan">Add New Daily Plan</string>
+    <string name="add_todo_list">Add To-Do List</string>
+    <string name="optional_description">Description (optional)</string>
+    <string name="time">Time</string>
+    <string name="add">Add</string>
+    <string name="preview">Preview</string>
+    <string name="finish">Finish</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="textField_error">This field cannot be left blank!</string>
+    <string name="empty_todo_list_warning">You haven\'t added a to-do list yet!</string>
+</resources>
