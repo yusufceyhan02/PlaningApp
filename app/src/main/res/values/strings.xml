@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">PlaningApp</string>
     <string name="daily_plan">Daily Plan</string>
+    <string name="weekly_plan">Weekly Plan</string>
+    <string name="reminder">Reminder</string>
+    <string name="tasks">Tasks</string>
     <string name="title">Title</string>
     <string name="add_new_daily_plan">Add New Daily Plan</string>
     <string name="add_todo_list">Add To-Do List</string>
@@ -13,4 +16,15 @@
     <string name="cancel">Cancel</string>
     <string name="textField_error">This field cannot be left blank!</string>
     <string name="empty_todo_list_warning">You haven\'t added a to-do list yet!</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="error">Error</string>
+    <string name="save">Save</string>
+    <string name="weekly_plan_info">Press and hold to add or edit a task.</string>
+    <string name="free_time">Free Time</string>
 </resources>

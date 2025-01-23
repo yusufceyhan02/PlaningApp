@@ -5,7 +5,7 @@ import android.icu.util.Calendar
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ceyhan.planingapp.models.DailyPlan
+import com.ceyhan.planingapp.models.daily.DailyPlanModel
 import com.ceyhan.planingapp.roomDatabase.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +16,13 @@ class DailyPlanViewModel(application: Application): AndroidViewModel(application
     val appDao = AppDatabase(getApplication()).appDao()
     var process = false
 
-    val dailyPlans = mutableStateListOf<DailyPlan>()
+    val dailyPlans = mutableStateListOf<DailyPlanModel>()
+
+    fun init() {
+        if (dailyPlans.isEmpty()) {
+            getDailyPlans()
+        }
+    }
 
     fun getDailyPlans() {
         if (!process) {
@@ -31,14 +37,14 @@ class DailyPlanViewModel(application: Application): AndroidViewModel(application
         }
     }
 
-    private fun checkDateAndChangeData(dailyPlansData: List<DailyPlan>) {
+    private fun checkDateAndChangeData(dailyPlansData: List<DailyPlanModel>) {
         val timeNow = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().time)
         var changedData = false
 
         dailyPlansData.forEach {
             if (it.date  != timeNow) {
                 it.date = timeNow
-                it.toDos.forEach { todo ->
+                it.dailyToDos.forEach { todo ->
                     todo.selected = false
                 }
                 updateDailyPlan(it)
@@ -56,7 +62,7 @@ class DailyPlanViewModel(application: Application): AndroidViewModel(application
         }
     }
 
-    fun updateDailyPlan(dailyPlan: DailyPlan) {
+    fun updateDailyPlan(dailyPlan: DailyPlanModel) {
         viewModelScope.launch(Dispatchers.IO) {
             appDao.updateDailyPlan(dailyPlan)
         }

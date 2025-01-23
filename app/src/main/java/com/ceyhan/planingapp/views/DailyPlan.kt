@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.ceyhan.planingapp.models.DailyPlan
+import com.ceyhan.planingapp.models.daily.DailyPlanModel
 import com.ceyhan.planingapp.models.Screen
-import com.ceyhan.planingapp.models.ToDo
+import com.ceyhan.planingapp.models.daily.DailyToDo
 import com.ceyhan.planingapp.ui.theme.PlaningAppTheme
 import com.ceyhan.planingapp.util.AddFloatingActionButton
 import com.ceyhan.planingapp.viewModel.DailyPlanViewModel
@@ -42,7 +42,7 @@ fun DailyPlan(navController: NavController, viewModel: DailyPlanViewModel) {
             dailyPlans.forEach { dailyPlan ->
                 DailyPlanCard(dailyPlan) { toDoIndex ->
                     val newDailyPlan = dailyPlan.apply {
-                        toDos[toDoIndex].also {
+                        dailyToDos[toDoIndex].also {
                             val newValue = !it.selected
                             it.selected = newValue
                         }
@@ -55,12 +55,12 @@ fun DailyPlan(navController: NavController, viewModel: DailyPlanViewModel) {
 }
 
 @Composable
-fun DailyPlanCard(dailyPlan: DailyPlan, selectedCheckBox: (index: Int) -> Unit) {
+fun DailyPlanCard(dailyPlan: DailyPlanModel, selectedCheckBox: (index: Int) -> Unit) {
     Card(Modifier.fillMaxWidth().padding(horizontal = 30.dp).padding(bottom = 20.dp)) {
         Column(Modifier.padding(10.dp)) {
             Text(dailyPlan.title, fontSize = 25.sp, modifier = Modifier.padding(start = 10.dp))
             Spacer(Modifier.padding(vertical = 5.dp))
-            dailyPlan.toDos.forEachIndexed { ix, todo ->
+            dailyPlan.dailyToDos.forEachIndexed { ix, todo ->
                 DailyPlanToDo(todo) {
                     selectedCheckBox(ix)
                 }
@@ -70,8 +70,8 @@ fun DailyPlanCard(dailyPlan: DailyPlan, selectedCheckBox: (index: Int) -> Unit) 
 }
 
 @Composable
-fun DailyPlanToDo(toDo: ToDo, selectedCheckBox: () -> Unit) {
-    val selected = remember { mutableStateOf(toDo.selected) }
+fun DailyPlanToDo(dailyToDo: DailyToDo, selectedCheckBox: () -> Unit) {
+    val selected = remember { mutableStateOf(dailyToDo.selected) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Checkbox(
             checked = selected.value,
@@ -81,16 +81,16 @@ fun DailyPlanToDo(toDo: ToDo, selectedCheckBox: () -> Unit) {
         })
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(toDo.title, fontSize = 20.sp, modifier = Modifier.weight(1f,fill = false))
+                Text(dailyToDo.title, fontSize = 20.sp, modifier = Modifier.weight(1f,fill = false))
                 Spacer(Modifier.padding(5.dp))
                 Icon(painterResource(R.drawable.ic_clock), contentDescription = null, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.padding(1.dp))
-                val hour = if (toDo.hour < 10) {"0${toDo.hour}"} else {"${toDo.hour}"}
-                val minute = if (toDo.minute < 10) {"0${toDo.minute}"} else {"${toDo.minute}"}
+                val hour = if (dailyToDo.hour < 10) {"0${dailyToDo.hour}"} else {"${dailyToDo.hour}"}
+                val minute = if (dailyToDo.minute < 10) {"0${dailyToDo.minute}"} else {"${dailyToDo.minute}"}
                 Text("${hour}:${minute}", fontSize = 14.sp)
             }
-            if (toDo.description.isNotEmpty()) {
-                Text(toDo.description)
+            if (dailyToDo.description.isNotEmpty()) {
+                Text(dailyToDo.description)
             }
         }
     }

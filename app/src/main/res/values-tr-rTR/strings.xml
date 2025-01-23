@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">PlaningApp</string>
     <string name="daily_plan">Günlük Planlama</string>
+    <string name="weekly_plan">Haftalık Planlama</string>
+    <string name="reminder">Hatırlatıcı</string>
+    <string name="tasks">Görevler</string>
     <string name="title">Başlık</string>
     <string name="add_new_daily_plan">Yeni Günlük Plan Ekle</string>
     <string name="add_todo_list">Yapılacaklar Listesi Ekle</string>
@@ -14,4 +17,15 @@
     <string name="cancel">İptal</string>
     <string name="textField_error">Bu alan boş bırakılamaz!</string>
     <string name="empty_todo_list_warning">Henüz yapılacaklar listesi eklemediniz!</string>
+    <string name="monday">Pazartesi</string>
+    <string name="tuesday">Salı</string>
+    <string name="wednesday">Çarsamba</string>
+    <string name="thursday">Persembe</string>
+    <string name="friday">Cuma</string>
+    <string name="saturday">Cumartesi</string>
+    <string name="sunday">Pazar</string>
+    <string name="error">Hata</string>
+    <string name="save">Kaydet</string>
+    <string name="weekly_plan_info">Görev eklemek veya düzenlemek için basılı tutun.</string>
+    <string name="free_time">Serbest Zaman</string>
 </resources>

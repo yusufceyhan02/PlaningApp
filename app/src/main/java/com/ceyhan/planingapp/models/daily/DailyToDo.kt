@@ -1,6 +1,6 @@
-package com.ceyhan.planingapp.models
+package com.ceyhan.planingapp.models.daily
 
-data class ToDo(
+data class DailyToDo(
     val title: String,
     val description: String,
     val hour: Int,
