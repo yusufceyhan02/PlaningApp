@@ -3,6 +3,7 @@ package com.ceyhan.planingapp.viewModel
 import android.app.Application
 import android.icu.util.Calendar
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ceyhan.planingapp.models.daily.DailyPlanModel
@@ -14,29 +15,37 @@ import java.util.Locale
 
 class DailyPlanViewModel(application: Application): AndroidViewModel(application) {
     val appDao = AppDatabase(getApplication()).appDao()
-    var process = false
+    var init  = false
+    var process = mutableStateOf(false)
 
     val dailyPlans = mutableStateListOf<DailyPlanModel>()
 
     fun init() {
-        if (dailyPlans.isEmpty()) {
+        if (!init) {
             getDailyPlans()
+            init = true
         }
     }
 
     fun getDailyPlans() {
-        if (!process) {
-            process = true
+        if (!process.value) {
+            process.value = true
             dailyPlans.clear()
             viewModelScope.launch(Dispatchers.IO) {
                 val dailyPlansData = appDao.getDailyPlans()
                 launch(Dispatchers.Main) {
-                    checkDateAndChangeData(dailyPlansData)
+                    if (dailyPlansData.isNotEmpty()) {
+                        checkDateAndChangeData(dailyPlansData)
+                    }
+                    else {
+                        process.value = false
+                    }
                 }
             }
         }
     }
 
+    // Her gün sıfırlanan checkbox
     private fun checkDateAndChangeData(dailyPlansData: List<DailyPlanModel>) {
         val timeNow = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().time)
         var changedData = false
@@ -53,18 +62,27 @@ class DailyPlanViewModel(application: Application): AndroidViewModel(application
         }
 
         if (changedData) {
-            process = false
+            process.value = false
             getDailyPlans()
         }
         else {
             dailyPlans.addAll(dailyPlansData)
-            process = false
+            process.value = false
         }
     }
 
     fun updateDailyPlan(dailyPlan: DailyPlanModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            appDao.updateDailyPlan(dailyPlan)
+            appDao.insertOrUpdateDailyPlan(dailyPlan)
+        }
+    }
+
+    fun deleteDailyPlan(dailyPlan: DailyPlanModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            appDao.deleteDailyPlan(dailyPlan)
+            launch(Dispatchers.Main) {
+                getDailyPlans()
+            }
         }
     }
 }

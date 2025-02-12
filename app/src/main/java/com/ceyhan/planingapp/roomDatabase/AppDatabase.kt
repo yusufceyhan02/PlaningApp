@@ -6,10 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.ceyhan.planingapp.models.daily.DailyPlanModel
+import com.ceyhan.planingapp.models.reminder.ReminderModel
+import com.ceyhan.planingapp.models.task.TaskModel
 import com.ceyhan.planingapp.models.weekly.WeeklyPlanModel
-import com.ceyhan.planingapp.viewModel.WeeklyPlanViewModel
 
-@Database(entities = [DailyPlanModel::class, WeeklyPlanModel::class], version = 3)
+@Database(entities = [DailyPlanModel::class, WeeklyPlanModel::class, ReminderModel::class, TaskModel::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun appDao(): AppDao

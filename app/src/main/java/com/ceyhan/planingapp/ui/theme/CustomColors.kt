@@ -17,7 +17,8 @@ data class CustomColors(
     val gray: Color,
     val grayHover: Color,
     val circleColor: Color,
-    val lineColor: Color
+    val lineColor: Color,
+    val reverseColor: Color
 )
 
 val LightCustomColors = CustomColors(
@@ -32,7 +33,8 @@ val LightCustomColors = CustomColors(
     gray = Color(0xFF495057),
     grayHover = Color(0xFFE9ECEF),
     circleColor = Color(0xFF495057),
-    lineColor = Color(0xFFE9ECEF)
+    lineColor = Color(0xFFE9ECEF),
+    reverseColor = Color(0xFF000000)
 )
 
 val DarkCustomColors = CustomColors(
@@ -47,5 +49,6 @@ val DarkCustomColors = CustomColors(
     gray = Color(0xFF6C757D),
     grayHover = Color(0xFF343A40),
     circleColor = Color(0xFFDEE2E6),
-    lineColor = Color(0xFF343A40)
+    lineColor = Color(0xFF343A40),
+    reverseColor = Color(0xFFFFFFFF)
 )

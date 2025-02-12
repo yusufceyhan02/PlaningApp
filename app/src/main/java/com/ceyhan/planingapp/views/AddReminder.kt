@@ -1,7 +1,14 @@
+@file:Suppress("DEPRECATION")
+
 package com.ceyhan.planingapp.views
 
 import android.icu.util.Calendar
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -11,13 +18,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -27,10 +42,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
@@ -41,16 +61,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ceyhan.planingapp.R
+import com.ceyhan.planingapp.models.Screen
 import com.ceyhan.planingapp.models.daily.DailyToDo
+import com.ceyhan.planingapp.models.reminder.ReminderModel
+import com.ceyhan.planingapp.models.reminder.ReminderToDo
+import com.ceyhan.planingapp.ui.theme.LocalCustomColors
 import com.ceyhan.planingapp.util.BackDialog
 import com.ceyhan.planingapp.util.CustomDatePickerDialog
 import com.ceyhan.planingapp.util.CustomTimePickerDialog
 import com.ceyhan.planingapp.viewModel.AddReminderViewModel
+import com.ceyhan.planingapp.viewModel.ReminderViewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun AddReminder(navController: NavController, viewModel: AddReminderViewModel) {
+fun AddReminder(navController: NavController, baseViewModel: ReminderViewModel, viewModel: AddReminderViewModel) {
+    val context = LocalContext.current
     val timeTextFieldSource = remember { MutableInteractionSource() }
     val dateTextFieldSource = remember { MutableInteractionSource() }
     val clickedTimePicker = remember { mutableStateOf(false) }
@@ -60,15 +88,13 @@ fun AddReminder(navController: NavController, viewModel: AddReminderViewModel) {
     val descriptionText = remember { mutableStateOf("") }
     val toDoText = remember { mutableStateOf("") }
     val timeText = remember { mutableStateOf("") }
-    val dateText = remember { mutableStateOf("") }
+    val dateText = remember { viewModel.dateText }
 
     val toDoError = remember { mutableStateOf(false) }
     val timeError = remember { mutableStateOf(false) }
     val dateError = remember { mutableStateOf(false) }
     val backDialog = remember { mutableStateOf(false) }
-
-    val hour = remember { viewModel.hour }
-    val minute = remember { viewModel.minute }
+    val selectedColor = remember { viewModel.selectedColor }
 
     if (timeTextFieldSource.collectIsPressedAsState().value) { clickedTimePicker.value = true }
     if (dateTextFieldSource.collectIsPressedAsState().value) { clickedDatePicker.value = true }
@@ -214,9 +240,9 @@ fun AddReminder(navController: NavController, viewModel: AddReminderViewModel) {
                 Spacer(Modifier.padding(vertical = 5.dp))
 
                 Button(onClick = {
-                    if (toDoText.value.trim().isNotEmpty() && hour != -1 && minute != -1) {
-                        val newDailyToDo = DailyToDo(toDoText.value,descriptionText.value,hour,minute,false)
-                        viewModel.toDoList.add(newDailyToDo)
+                    if (toDoText.value.trim().isNotEmpty() && viewModel.hour != -1 && viewModel.minute != -1) {
+                        val newReminderToDo = ReminderToDo(toDoText.value,descriptionText.value,viewModel.hour,viewModel.minute,timeText.value)
+                        viewModel.toDoList.add(newReminderToDo)
                         toDoText.value = ""
                         descriptionText.value = ""
                         viewModel.hour = -1
@@ -227,12 +253,55 @@ fun AddReminder(navController: NavController, viewModel: AddReminderViewModel) {
                     else if (toDoText.value.trim().isEmpty()) {
                         toDoError.value = true
                     }
-                    else if (hour == -1 || minute == -1) {
+                    else if (viewModel.hour == -1 || viewModel.minute == -1) {
                         timeError.value = true
                     }
                 }, modifier = Modifier.padding(end = 10.dp)) { Text(stringResource(R.string.add)) }
             }
         }
+
+        Spacer(Modifier.padding(vertical = 10.dp))
+
+        Row {
+            SelectableColorCircle(0,selectedColor.intValue) { viewModel.selectedColor.intValue = it }
+            Spacer(Modifier.padding(horizontal = 5.dp))
+            SelectableColorCircle(1,selectedColor.intValue) { viewModel.selectedColor.intValue = it }
+            Spacer(Modifier.padding(horizontal = 5.dp))
+            SelectableColorCircle(2,selectedColor.intValue) { viewModel.selectedColor.intValue = it }
+            Spacer(Modifier.padding(horizontal = 5.dp))
+            SelectableColorCircle(3,selectedColor.intValue) { viewModel.selectedColor.intValue = it }
+            Spacer(Modifier.padding(horizontal = 5.dp))
+            SelectableColorCircle(4,selectedColor.intValue) { viewModel.selectedColor.intValue = it }
+        }
+
+        Spacer(Modifier.padding(vertical = 20.dp))
+
+        Text(stringResource(R.string.preview), fontSize = 14.sp, color = Color.Gray)
+
+        EditReminderCalendarView(ReminderModel(0,selectedColor.intValue,viewModel.dateMillis,dateText.value,toDoList)) { removedItem ->
+            viewModel.toDoList.remove(removedItem)
+        }
+
+        Spacer(Modifier.padding(vertical = 10.dp))
+
+        Button(onClick = {
+            if (dateText.value.trim().isNotEmpty() && toDoList.isNotEmpty()) {
+                viewModel.insertReminder {
+                    baseViewModel.getReminders()
+                    navController.popBackStack()
+                }
+            }
+            else if (dateText.value.trim().isEmpty()) {
+                dateError.value = true
+            }
+            else if (toDoList.isEmpty()) {
+                Toast.makeText(context,context.getText(R.string.empty_todo_list_warning), Toast.LENGTH_LONG).show()
+            }
+        }) {
+            Text(stringResource(R.string.finish))
+        }
+
+        Spacer(Modifier.padding(vertical = 5.dp))
     }
 
     BackHandler {
@@ -253,8 +322,74 @@ fun AddReminder(navController: NavController, viewModel: AddReminderViewModel) {
     }
 }
 
+@Composable
+fun EditReminderCalendarView(reminder: ReminderModel, removeToDo: (item: ReminderToDo) -> Unit) {
+
+    GetReminderColors(reminder.colorsIndex) { color, hoverColor ->
+        Column(Modifier.padding(horizontal = 30.dp)) {
+            Box {
+                Box(Modifier.fillMaxWidth().padding(top = 20.dp).height(40.dp).background(color, RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)), contentAlignment = Alignment.Center) {
+                    Text(reminder.dateText, color = Color.White)
+                }
+                Row(Modifier.fillMaxWidth()) {
+                    Circle(Modifier.padding(start = 10.dp))
+                    Spacer(Modifier.weight(1f))
+                    Circle(Modifier.padding(end = 10.dp))
+                }
+            }
+            Column(Modifier.fillMaxWidth().heightIn(min = 80.dp).background(hoverColor, RoundedCornerShape(bottomEnd = 5.dp, bottomStart = 5.dp)).padding(horizontal = 10.dp), verticalArrangement = Arrangement.Center) {
+                reminder.reminderToDos.forEach { todo ->
+                    Spacer(Modifier.padding(vertical = 5.dp))
+                    Row(Modifier.fillMaxWidth()) {
+                        Row(Modifier.weight(1f)) {
+                            Icon(Icons.Default.Menu, contentDescription = null)
+                            Spacer(Modifier.padding(horizontal = 2.dp))
+                            Column {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(todo.title, modifier = Modifier.weight(1f,false))
+                                    Spacer(Modifier.padding(horizontal = 3.dp))
+                                    Icon(painterResource(R.drawable.ic_clock), contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(Modifier.padding(horizontal = 1.dp))
+                                    Text(todo.time, fontSize = 14.sp)
+                                }
+                                if (todo.description.isNotEmpty()) {Text(todo.description, fontSize = 12.sp)}
+                            }
+                        }
+                        IconButton(
+                            onClick = {
+                                removeToDo(todo)
+                            },
+                            modifier = Modifier.size(30.dp)
+                        ) { Icon(Icons.Default.Clear, contentDescription = "clear") }
+                    }
+                }
+                Spacer(Modifier.padding(vertical = 5.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun SelectableColorCircle(index: Int, selectedIndex: Int, select: (index: Int) -> Unit) {
+    GetReminderColors(index) { color, hoverColor ->
+        if (selectedIndex == index) {
+            Box(Modifier.size(32.dp).clip(CircleShape).background(color = color).border(width = 2.dp, color = LocalCustomColors.current.reverseColor, shape = CircleShape), contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = "check"
+                )
+            }
+        }
+        else {
+            Box(Modifier.size(32.dp).clip(CircleShape).background(color = color).clickable {
+                select(index)
+            })
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun AddReminderPreview() {
-    AddReminder(rememberNavController(), viewModel())
+    AddReminder(rememberNavController(),viewModel(),viewModel())
 }

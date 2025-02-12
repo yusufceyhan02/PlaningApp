@@ -27,5 +27,6 @@
     <string name="error">Hata</string>
     <string name="save">Kaydet</string>
     <string name="weekly_plan_info">Görev eklemek veya düzenlemek için basılı tutun.</string>
+    <string name="options_info">Seçenekleri görmek için üzerine basılı tutun.</string>
     <string name="free_time">Serbest Zaman</string>
 </resources>

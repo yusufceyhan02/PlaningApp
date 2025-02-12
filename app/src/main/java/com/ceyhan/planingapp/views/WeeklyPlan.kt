@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,6 +43,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,11 +62,16 @@ import com.ceyhan.planingapp.models.weekly.WeeklyToDo
 import com.ceyhan.planingapp.ui.theme.PlaningAppTheme
 import com.ceyhan.planingapp.util.CustomTimePickerDialog
 import com.ceyhan.planingapp.viewModel.WeeklyPlanViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorder
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
+import java.util.UUID
 
 @Composable
 fun WeeklyPlan(viewModel: WeeklyPlanViewModel) {
@@ -107,6 +115,7 @@ fun WeeklyPlanCard(weeklyPlanModel: WeeklyPlanModel, updateModel: (newWeeklyPlan
             Column(Modifier.fillMaxWidth().padding(30.dp)) {
                 if (weeklyPlanModel.weeklyToDos.isNotEmpty()) {
                     weeklyPlanModel.weeklyToDos.forEach {
+                        Spacer(Modifier.padding(vertical = 5.dp))
                         WeeklyPlanToDo(it)
                     }
                 }
@@ -123,8 +132,8 @@ fun WeeklyPlanCard(weeklyPlanModel: WeeklyPlanModel, updateModel: (newWeeklyPlan
 
 @Composable
 fun WeeklyPlanToDo(weeklyToDo: WeeklyToDo) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(painterResource(R.drawable.ic_point), contentDescription = "point", Modifier.size(12.dp))
+    Row {
+        Icon(painterResource(R.drawable.ic_point), contentDescription = "point", Modifier.padding(top = 6.dp).size(12.dp))
         Spacer(Modifier.padding(horizontal = 2.dp))
         Text(weeklyToDo.title, modifier = Modifier.weight(1f,fill = false))
         Spacer(Modifier.padding(horizontal = 5.dp))
@@ -148,11 +157,11 @@ fun WeeklyPlanEditDialog(weeklyPlanModel: WeeklyPlanModel, dismiss: () -> Unit, 
     val list = remember { mutableStateListOf<WeeklyToDo>() }
     if (list.isEmpty()) { list.addAll(weeklyPlanModel.weeklyToDos) }
 
+    val coroutineScope = rememberCoroutineScope()
     val state = rememberReorderableLazyListState(onMove = { from, to ->
         list.apply {
             list.add(to.index, removeAt(from.index))
         }
-        println(list)
     })
 
     if (timeTextFieldSource.collectIsPressedAsState().value) { clickedTimePicker.value = true }
@@ -175,19 +184,21 @@ fun WeeklyPlanEditDialog(weeklyPlanModel: WeeklyPlanModel, dismiss: () -> Unit, 
                     if (list.isNotEmpty()) {
                         LazyColumn(
                             state = state.listState,
-                            modifier = Modifier.reorderable(state).detectReorderAfterLongPress(state)
+                            modifier = Modifier.reorderable(state).detectReorderAfterLongPress(state).heightIn(max = 300.dp)
                         ) {
-                            items(list, key = {it.title}) { item ->
-                                ReorderableItem(state, key = {item.title}) {
-                                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Default.Menu, contentDescription = null)
+                            items(list, key = {UUID.randomUUID()}) { item ->
+                                ReorderableItem(state, key = {UUID.randomUUID()}) {
+                                    Row(Modifier.fillMaxWidth()) {
+                                        Icon(Icons.Default.Menu, contentDescription = null, modifier = Modifier.padding(vertical = 1.dp))
                                         Spacer(Modifier.padding(horizontal = 2.dp))
-                                        Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                                            Text(item.title, modifier = Modifier.weight(1f,false))
+                                        Row(modifier = Modifier.weight(1f)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 1.dp)) {
+                                                Icon(painterResource(R.drawable.ic_clock), contentDescription = null, modifier = Modifier.size(14.dp))
+                                                Spacer(Modifier.padding(horizontal = 1.dp))
+                                                Text(item.time, fontSize = 14.sp)
+                                            }
                                             Spacer(Modifier.padding(horizontal = 5.dp))
-                                            Icon(painterResource(R.drawable.ic_clock), contentDescription = null, modifier = Modifier.size(14.dp))
-                                            Spacer(Modifier.padding(horizontal = 1.dp))
-                                            Text(item.time, fontSize = 14.sp)
+                                            Text(item.title, modifier = Modifier.weight(1f,false))
                                         }
                                         IconButton(
                                             onClick = {
@@ -198,6 +209,7 @@ fun WeeklyPlanEditDialog(weeklyPlanModel: WeeklyPlanModel, dismiss: () -> Unit, 
                                 }
                             }
                         }
+                        Text("Basılı tutup sürükleyerek listeyi düzenleyebilirsiniz.", fontSize = 11.sp, color = Color.Gray)
                     }
                     else {
                         Column(Modifier.padding(horizontal = 15.dp).padding(top = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -264,6 +276,9 @@ fun WeeklyPlanEditDialog(weeklyPlanModel: WeeklyPlanModel, dismiss: () -> Unit, 
                                         list.add(toDo)
                                         titleText.value = ""
                                         timeText.value = ""
+                                        coroutineScope.launch {
+                                            state.listState.animateScrollToItem(index = list.lastIndex)
+                                        }
                                     }
                                     else if (titleText.value.trim().isEmpty()) {
                                         titleError.value = true

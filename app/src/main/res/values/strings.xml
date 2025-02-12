@@ -26,5 +26,6 @@
     <string name="error">Error</string>
     <string name="save">Save</string>
     <string name="weekly_plan_info">Press and hold to add or edit a task.</string>
+    <string name="options_info">Press and hold on it to see the options.</string>
     <string name="free_time">Free Time</string>
 </resources>

@@ -6,8 +6,10 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class DailyPlanModel(
-    @PrimaryKey(autoGenerate = true) val uid: Int,
-    @ColumnInfo("title") val title: String,
-    @ColumnInfo("todos") val dailyToDos: List<DailyToDo>,
+    @PrimaryKey(autoGenerate = true) var uid: Int,
+    @ColumnInfo("title") var title: String,
+    @ColumnInfo("todos") var dailyToDos: List<DailyToDo>,
     @ColumnInfo("date") var date: String
 )
+
+
