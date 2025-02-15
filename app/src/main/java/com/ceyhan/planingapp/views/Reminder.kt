@@ -63,6 +63,11 @@ import com.google.gson.reflect.TypeToken
 fun Reminder(navController: NavController, viewModel: ReminderViewModel) {
     val reminderList = remember { viewModel.reminderList }
     val process = remember { viewModel.process }
+    val firstStart = remember { viewModel.firstStart }
+
+    if (firstStart.value) {
+        ReminderFirstStart()
+    }
 
     Scaffold (floatingActionButton = { AddFloatingActionButton { navController.navigate(route = Screen.ADD_REMINDER.name) } }) { innerPadding ->
         Column(Modifier.fillMaxSize().consumeWindowInsets(innerPadding), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -174,6 +179,11 @@ fun ReminderOptions(dismiss: () -> Unit, edit: () -> Unit, delete: () -> Unit) {
             ) { Text("Sil") }
         }
     }
+}
+
+@Composable
+fun ReminderFirstStart() {
+
 }
 
 @Composable

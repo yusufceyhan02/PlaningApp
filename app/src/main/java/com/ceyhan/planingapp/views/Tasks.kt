@@ -61,6 +61,11 @@ fun Tasks(viewModel: TaskViewModel) {
     val progress = remember { viewModel.process }
     val taskList = remember { viewModel.taskList }
     val addButton = remember { mutableStateOf(false) }
+    val firstStart = remember { viewModel.firstStart }
+
+    if (firstStart.value) {
+        TaskFirstStart()
+    }
 
     if (addButton.value) {
         AddTaskDialog(null,viewModel) {
@@ -254,4 +259,9 @@ fun TaskOptions(task: TaskModel, dismiss: () -> Unit, edit: () -> Unit, delete: 
             ) { Text("Sil") }
         }
     }
+}
+
+@Composable
+fun TaskFirstStart() {
+
 }

@@ -76,6 +76,11 @@ import java.util.UUID
 @Composable
 fun WeeklyPlan(viewModel: WeeklyPlanViewModel) {
     val weeklyPlans = remember { viewModel.weeklyPlanList }
+    val firstStart = remember { viewModel.firstStart }
+
+    if (firstStart.value) {
+        WeeklyPlanFirstStart()
+    }
 
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(stringResource(R.string.weekly_plan_info), fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 10.dp, bottom = 2.dp))
@@ -308,6 +313,11 @@ fun WeeklyPlanEditDialog(weeklyPlanModel: WeeklyPlanModel, dismiss: () -> Unit, 
             Text(getWeeklyDay(weeklyPlanModel.uid), fontSize = 25.sp, fontFamily = FontFamily(Font(R.font.super_bubble)), color = Color(0xFFFFA500))
         }
     }
+}
+
+@Composable
+fun WeeklyPlanFirstStart() {
+
 }
 
 @Composable

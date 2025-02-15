@@ -17,10 +17,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +34,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.ceyhan.planingapp.database.FirstStartScreen
+import com.ceyhan.planingapp.database.getFirstStartScreen
 import com.ceyhan.planingapp.models.BottomNavItem
 import com.ceyhan.planingapp.models.Screen
 import com.ceyhan.planingapp.models.daily.DailyPlanModel
@@ -50,6 +55,8 @@ import com.ceyhan.planingapp.views.Tasks
 import com.ceyhan.planingapp.views.WeeklyPlan
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -66,7 +73,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
+    val context = LocalContext.current
     val navController = rememberNavController()
+    val coroutineScope = rememberCoroutineScope()
+    val firstStartScreens = remember { mutableStateOf<FirstStartScreen?>(null) }
 
     val dailyPlanViewModel = viewModel<DailyPlanViewModel>()
     val addDailyPlanViewModel = viewModel<AddDailyPlanViewModel>()
@@ -75,10 +85,17 @@ fun MainScreen() {
     val addReminderViewModel = viewModel<AddReminderViewModel>()
     val taskViewModel = viewModel<TaskViewModel>()
 
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val firstStartScreen = getFirstStartScreen(context)
+            firstStartScreens.value = firstStartScreen.first()
+        }
+    }
+
     Scaffold (bottomBar = { MainBottomBar(navController) }) { innerPadding ->
         NavHost(navController = navController, startDestination = Screen.DAILY_PLAN.name, modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             composable(route = Screen.DAILY_PLAN.name) {
-                dailyPlanViewModel.init()
+                dailyPlanViewModel.init(firstStartScreens.value?.dailyPlan == true)
                 DailyPlan(navController,dailyPlanViewModel)
             }
             composable(route = "${Screen.ADD_DAILY_PLAN.name}?gsonDaily={gsonDaily}", arguments = listOf(navArgument(name = "gsonDaily") {
@@ -97,11 +114,11 @@ fun MainScreen() {
                 AddDailyPlan(navController,dailyPlanViewModel,addDailyPlanViewModel)
             }
             composable(route = Screen.WEEKLY_PLAN.name) {
-                weeklyPlanViewModel.init()
+                weeklyPlanViewModel.init(firstStartScreens.value?.weeklyPlan == true)
                 WeeklyPlan(weeklyPlanViewModel)
             }
             composable(route = Screen.REMINDER.name) {
-                reminderViewModel.init()
+                reminderViewModel.init(firstStartScreens.value?.reminder == true)
                 Reminder(navController,reminderViewModel)
             }
             composable(route = "${Screen.ADD_REMINDER.name}?gsonReminder={gsonReminder}", arguments = listOf(navArgument(name = "gsonReminder") {
@@ -120,7 +137,7 @@ fun MainScreen() {
                 AddReminder(navController,reminderViewModel,addReminderViewModel)
             }
             composable(route = Screen.TASKS.name) {
-                taskViewModel.init()
+                taskViewModel.init(firstStartScreens.value?.tasks == true)
                 Tasks(taskViewModel)
             }
         }

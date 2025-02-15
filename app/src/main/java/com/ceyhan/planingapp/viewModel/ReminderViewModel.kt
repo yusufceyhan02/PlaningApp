@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ceyhan.planingapp.models.reminder.ReminderModel
-import com.ceyhan.planingapp.roomDatabase.AppDatabase
+import com.ceyhan.planingapp.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -14,14 +14,16 @@ class ReminderViewModel(application: Application): AndroidViewModel(application)
     val appDao = AppDatabase(application).appDao()
     var init = false
     var process = mutableStateOf(false)
+    var firstStart = mutableStateOf(false)
 
     val reminderList = mutableStateListOf<ReminderModel>()
 
-    fun init() {
+    fun init(firstStartData: Boolean) {
         if (!init) {
             getReminders()
             init = true
         }
+        firstStart.value = firstStartData
     }
 
     fun getReminders() {

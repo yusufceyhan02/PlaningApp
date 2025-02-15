@@ -8,7 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ceyhan.planingapp.models.reminder.ReminderModel
 import com.ceyhan.planingapp.models.reminder.ReminderToDo
-import com.ceyhan.planingapp.roomDatabase.AppDatabase
+import com.ceyhan.planingapp.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

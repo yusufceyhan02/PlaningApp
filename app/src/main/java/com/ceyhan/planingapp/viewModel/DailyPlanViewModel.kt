@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ceyhan.planingapp.models.daily.DailyPlanModel
-import com.ceyhan.planingapp.roomDatabase.AppDatabase
+import com.ceyhan.planingapp.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -17,14 +17,16 @@ class DailyPlanViewModel(application: Application): AndroidViewModel(application
     val appDao = AppDatabase(getApplication()).appDao()
     var init  = false
     var process = mutableStateOf(false)
+    var firstStart = mutableStateOf(false)
 
     val dailyPlans = mutableStateListOf<DailyPlanModel>()
 
-    fun init() {
+    fun init(firstStartData: Boolean) {
         if (!init) {
             getDailyPlans()
             init = true
         }
+        firstStart.value = firstStartData
     }
 
     fun getDailyPlans() {

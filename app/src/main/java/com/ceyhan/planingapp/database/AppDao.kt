@@ -1,4 +1,4 @@
-package com.ceyhan.planingapp.roomDatabase
+package com.ceyhan.planingapp.database
 
 import androidx.room.Dao
 import androidx.room.Delete

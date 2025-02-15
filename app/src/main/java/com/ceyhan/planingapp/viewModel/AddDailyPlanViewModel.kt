@@ -7,12 +7,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ceyhan.planingapp.models.daily.DailyPlanModel
 import com.ceyhan.planingapp.models.daily.DailyToDo
-import com.ceyhan.planingapp.roomDatabase.AppDatabase
+import com.ceyhan.planingapp.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
-import java.util.UUID
 
 class AddDailyPlanViewModel(application: Application): AndroidViewModel(application) {
     val appDao = AppDatabase(getApplication()).appDao()

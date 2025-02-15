@@ -54,6 +54,11 @@ import com.google.gson.reflect.TypeToken
 fun DailyPlan(navController: NavController, viewModel: DailyPlanViewModel) {
     val dailyPlans = remember { viewModel.dailyPlans }
     val process = remember { viewModel.process }
+    val firstStart = remember { viewModel.firstStart }
+
+    if (firstStart.value) {
+        DailyPlanFirstStart()
+    }
 
     Scaffold (floatingActionButton = { AddFloatingActionButton { navController.navigate(route = Screen.ADD_DAILY_PLAN.name) } }) { innerPadding ->
         Column(
@@ -182,6 +187,11 @@ fun DailyPlanOptions(dismiss: () -> Unit, edit: () -> Unit, delete: () -> Unit) 
             ) { Text("Sil") }
         }
     }
+}
+
+@Composable
+fun DailyPlanFirstStart() {
+
 }
 
 @Preview(showBackground = true)

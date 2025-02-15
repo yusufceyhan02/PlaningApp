@@ -1,4 +1,4 @@
-package com.ceyhan.planingapp.roomDatabase
+package com.ceyhan.planingapp.database
 
 import android.content.Context
 import androidx.room.Database

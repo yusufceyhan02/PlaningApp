@@ -1,4 +1,4 @@
-package com.ceyhan.planingapp.roomDatabase
+package com.ceyhan.planingapp.database
 
 import androidx.room.TypeConverter
 import com.ceyhan.planingapp.models.daily.DailyToDo

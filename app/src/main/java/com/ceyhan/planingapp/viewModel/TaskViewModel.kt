@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ceyhan.planingapp.models.task.TaskModel
-import com.ceyhan.planingapp.roomDatabase.AppDatabase
+import com.ceyhan.planingapp.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -15,16 +15,18 @@ class TaskViewModel(application: Application): AndroidViewModel(application) {
     val appDao = AppDatabase(application).appDao()
     var init = false
     var process = mutableStateOf(false)
+    var firstStart = mutableStateOf(false)
 
     val taskList = mutableStateListOf<TaskModel>()
     val title = mutableStateOf("")
     val description = mutableStateOf("")
 
-    fun init() {
+    fun init(firstStartData: Boolean) {
         if (!init) {
             getTasks()
             init = true
         }
+        firstStart.value = firstStartData
     }
 
     fun getTasks() {
